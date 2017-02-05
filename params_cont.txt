@@ -1,0 +1,26 @@
+#data set params
+data_12m='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/calib_MS/calibrated_final.ms'
+data_7m='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/calib_MS_7m_fix/calibrated_final.ms'
+field_12m='4~36'
+field_7m='5~18'
+remakems='T'
+#cont spw params
+spw_arr='2'#for 12m array
+spw_7m='2,11,20'#for 7m array, also  but bad weights
+#general image params
+mythreshold12='0.5mJy'
+myimsize12=512
+mycell12='0.2arcsec'
+mythreshold7='0.5mJy'
+myimsize7=128
+mycell7='1arcsec'
+mythreshold127='0.5mJy'
+myimsize127=512
+mycell127='0.2arcsec'
+mynterms=2
+myniter12=5000
+myniter7=5000
+myniter127=5000
+mymask12=''
+mymask7=''
+mymask127=''

@@ -1,0 +1,29 @@
+#data set params
+data_12m='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/calib_MS/calibrated_final.ms'
+data_7m='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/calib_MS_7m_fix/calibrated_final.ms'
+data_TP='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/2015.1.00976.S/science_goal.uid___A001_X2d6_X61/group.uid___A001_X2d6_X62/member.uid___A001_X2d6_X69/product/Radio_Peak_of_IRAS_19132+1035'
+field_12m='4~36'
+field_7m='5~18'
+remakems='F'
+remakemsconts='F'
+#line params
+line='H2CO_321_220'
+spw_sd='29'#for single dish
+spw_arr='6'#for 12m array
+spw_7m='6,15,24'#for 7m array, also 15 but bad weights
+#template image params
+myniter_temp=1
+mynchan_temp=-1
+mystart_temp=''
+mywidth_temp=1
+#general image params
+mythreshold='6mJy'
+myimsize=800
+mycell='0.2arcsec'
+myrestfreq='218.76007GHz'
+whichmethod='C'#C for CASA, S for SpectralCube, doesnt really make a difference
+#deep clean params
+myniter=20000
+mynchan=100
+mystart=400
+mywidth=1
