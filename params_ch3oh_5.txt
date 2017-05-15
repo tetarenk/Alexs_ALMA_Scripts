@@ -7,23 +7,23 @@ field_7m='5~18'
 remakems='F'
 remakemsconts='F'
 #line params
-line='13CO'
-spw_sd='33'#for single dish
-spw_arr='8'#for 12m array
-spw_7m='8,17,26'#for 7m array, also 17 but bad weighting so not included
+line='CH3OH_5'
+spw_sd='27'#for single dish
+spw_arr='5'#for 12m array
+spw_7m='5,14,23'#for 7m array, also 14 but bad weights
 #template image params
 myniter_temp=1
 mynchan_temp=-1
 mystart_temp=''
 mywidth_temp=1
 #general image params
-mythreshold='8mJy'
+mythreshold='6mJy'
 myimsize=800
 mycell='0.2arcsec'
-myrestfreq='220.39868GHz'
+myrestfreq='218.44005GHz'
 whichmethod='C'#C for CASA, S for SpectralCube, doesnt really make a difference
 #deep clean params
 myniter=20000
-mynchan=478
-mystart=1
+mynchan=100
+mystart=520
 mywidth=1

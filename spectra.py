@@ -80,7 +80,7 @@ def fit_gauss_to_spec(fitsfile,ddir,line,tmaxfits):
 	return(asp.specfit.modelpars,asp.specfit.modelerrs)
 	
 
-
+'''
 #single spectra for a specific line and a specific pixel or region
 line='13CO'
 lim=[385,400,560,575]
@@ -147,7 +147,7 @@ plt.legend(numpoints=1,loc='upper left')
 #plt.ylim(0,2)
 plt.savefig(datadir+'spectra_plots/H2CO_max.pdf',format='pdf')
 plt.show()
-raw_input('enter')
+raw_input('enter')'''
 #guassian fitting of a line at max pixel
 '''tmaxfits=datadir+'T_max_maps/H2CO_303_202_tmax.fits'
 line='13CO'
@@ -177,33 +177,33 @@ lim=[385,400,560,575]
 v13,a13=make_spec(datadir+'alex_imaging_'+line13+'_fix/GRS1915_modelimg_'+line13+'.image.pbcor.fits',datadir,lim,'reg')
 v12,a12=make_spec(datadir+'alex_imaging_'+line12+'_fix/GRS1915_modelimg_'+line12+'.image.pbcor.fits',datadir,lim,'reg')
 v18,a18=make_spec(datadir+'alex_imaging_'+line18+'_fix/GRS1915_modelimg_'+line18+'.image.pbcor.fits',datadir,lim,'reg')
-l1=ax1.plot(v12, a12, label=line13, color='b', ls='-',lw=2)
-l2=ax1.plot(v13, a13, label=line12, color='m', ls='-.',lw=2)
-l3=ax1.plot(v18, a18, label=line18, color='c', ls='--',lw=2)
+ax1.plot(v12, a12, label='$^{12}{\\rm CO}$', color='#848484', ls='--',lw=3)
+ax1.plot(v13, a13, label='$^{13}{\\rm CO}$', color='#424242', ls=':',lw=3)
+ax1.plot(v18, a18, label='${\\rm C}^{18}{\\rm O}$', color='k', ls='-',lw=3)
 plt.setp(ax1.get_xticklabels(), visible=False)
-ax1.text(80, 22, 'ridge')
+ax1.text(58, 22, 'A')
 ax1.set_ylim(0,25)
 ax2=fig.add_subplot(222,sharey=ax1)#nonthermal
 lim=[400,420,570,595]
 v13,a13=make_spec(datadir+'alex_imaging_'+line13+'_fix/GRS1915_modelimg_'+line13+'.image.pbcor.fits',datadir,lim,'reg')
 v12,a12=make_spec(datadir+'alex_imaging_'+line12+'_fix/GRS1915_modelimg_'+line12+'.image.pbcor.fits',datadir,lim,'reg')
 v18,a18=make_spec(datadir+'alex_imaging_'+line18+'_fix/GRS1915_modelimg_'+line18+'.image.pbcor.fits',datadir,lim,'reg')
-ax2.plot(v12, a12, label=line13, color='b', ls='-',lw=2)
-ax2.plot(v13, a13, label=line12, color='m', ls='-.',lw=2)
-ax2.plot(v18, a18, label=line18, color='c', ls='--',lw=2)
+ax2.plot(v12, a12, label='$^{12}{\\rm CO}$', color='#848484', ls='--',lw=3)
+ax2.plot(v13, a13, label='$^{13}{\\rm CO}$', color='#424242', ls=':',lw=3)
+ax2.plot(v18, a18, label='${\\rm C}^{18}{\\rm O}$', color='k', ls='-',lw=3)
 plt.setp(ax2.get_xticklabels(), visible=False)
 plt.setp(ax2.get_yticklabels(), visible=False)
-ax2.text(80, 22, 'NT')
+ax2.text(58, 22, 'B')
 ax2.set_ylim(0,25)
 ax3=fig.add_subplot(223,sharex=ax1)#hmsr
 lim=[340,360,470,485]
-v13,a13=make_spec(datadir+'alex_imaging_'+line13+'/GRS1915_modelimg_'+line13+'.image.pbcor.fits',datadir,lim,'reg')
-v12,a12=make_spec(datadir+'alex_imaging_'+line12+'/GRS1915_modelimg_'+line12+'.image.pbcor.fits',datadir,lim,'reg')
-v18,a18=make_spec(datadir+'alex_imaging_'+line18+'/GRS1915_modelimg_'+line18+'.image.pbcor.fits',datadir,lim,'reg')
-ax3.plot(v12, a12, label=line13, color='b', ls='-',lw=2)
-ax3.plot(v13, a13, label=line12, color='m', ls='-.',lw=2)
-ax3.plot(v18, a18, label=line18, color='c', ls='--',lw=2)
-ax3.text(80, 22, 'hmsr')
+v13,a13=make_spec(datadir+'alex_imaging_'+line13+'_fix/GRS1915_modelimg_'+line13+'.image.pbcor.fits',datadir,lim,'reg')
+v12,a12=make_spec(datadir+'alex_imaging_'+line12+'_fix/GRS1915_modelimg_'+line12+'.image.pbcor.fits',datadir,lim,'reg')
+v18,a18=make_spec(datadir+'alex_imaging_'+line18+'_fix/GRS1915_modelimg_'+line18+'.image.pbcor.fits',datadir,lim,'reg')
+ax3.plot(v12, a12, label='$^{12}{\\rm CO}$', color='#848484', ls='--',lw=3)
+ax3.plot(v13, a13, label='$^{13}{\\rm CO}$', color='#424242', ls=':',lw=3)
+ax3.plot(v18, a18, label='${\\rm C}^{18}{\\rm O}$', color='k', ls='-',lw=3)
+ax3.text(58, 22, 'C')
 ax3.set_ylim(0,25)
 ax4=fig.add_subplot(224)#off
 #lim=[490,505,490,505]
@@ -211,21 +211,26 @@ lim=[507,580,447,492]
 v13,a13=make_spec(datadir+'alex_imaging_'+line13+'_fix/GRS1915_modelimg_'+line13+'.image.pbcor.fits',datadir,lim,'reg')
 v12,a12=make_spec(datadir+'alex_imaging_'+line12+'_fix/GRS1915_modelimg_'+line12+'.image.pbcor.fits',datadir,lim,'reg')
 v18,a18=make_spec(datadir+'alex_imaging_'+line18+'_fix/GRS1915_modelimg_'+line18+'.image.pbcor.fits',datadir,lim,'reg')
-ax4.plot(v12, a12, label=line13, color='b', ls='-',lw=2)
-ax4.plot(v13, a13, label=line12, color='m', ls='-.',lw=2)
-ax4.plot(v18, a18, label=line18, color='c', ls='--',lw=2)
-ax4.text(80, 22, 'off')
+ax4.plot(v12, a12, label='$^{12}{\\rm CO}$', color='#848484', ls='--',lw=3)
+ax4.plot(v13, a13, label='$^{13}{\\rm CO}$', color='#424242', ls=':',lw=3)
+ax4.plot(v18, a18, label='${\\rm C}^{18}{\\rm O}$', color='k', ls='-',lw=3)
+ax4.text(58, 22, 'D')
 ax4.set_ylim(0,25)
 plt.setp(ax4.get_yticklabels(), visible=False)
 ax4.set_xticks([60,65,70,75,80,85])
 ax3.set_xticks([55,60,65,70,75,80])
 ax3.set_yticks([0,5,10,15,20])
 ax1.set_yticks([0,5,10,15,20,25])
+ax1.tick_params(axis='both', which='major', length=5,width=2)
+ax2.tick_params(axis='both', which='major', length=5,width=2)
+ax3.tick_params(axis='both', which='major', length=5,width=2)
+ax4.tick_params(axis='both', which='major', length=5,width=2)
 #plt.tight_layout()
 #plt.legend((l1, l2,l3), (line13, line12,line18), loc='upper center',ncol=3)
 fig.subplots_adjust(top=0.9,wspace=0.,hspace=0.)
-ax1.legend(bbox_to_anchor=(0.5, 1.02, 1.25, .102), loc=3,
-              ncol=3, mode="expand", borderaxespad=0.)
-plt.savefig(datadir+'spectra_plots/COspectra.pdf')
+ax2.legend(loc='upper right',ncol=1)
+plt.savefig(datadir+'for_paper/COspectra.pdf')
 plt.show()
+
+
 

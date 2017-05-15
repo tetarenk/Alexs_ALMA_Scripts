@@ -24,6 +24,6 @@ myrestfreq='231.32183GHz'
 whichmethod='C'#C for CASA, S for SpectralCube, doesnt really make a difference
 #deep clean params
 myniter=20000
-mynchan=60
-mystart=270
+mynchan=478
+mystart=1
 mywidth=1

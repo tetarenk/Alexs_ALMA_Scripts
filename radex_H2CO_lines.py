@@ -1,5 +1,6 @@
 import pyspeckit
-import astropy.io.fits as pyfits
+import matplotlib
+import pyfits
 from pyspeckit.spectrum import models
 from spectral_cube import SpectralCube
 import astropy.units as u
@@ -9,20 +10,15 @@ import astropy.table
 from astropy.table import Table
 import matplotlib.pyplot as plt
 from astropy.io import fits
-import pyfits
 import pylab as pl
 import math as ma
 from astropy.table import hstack
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-#import aplpy, atpy
 import matplotlib.cm as cm
 from astropy import wcs
 from astropy.coordinates import SkyCoord
 import matplotlib.patches as patches
-import matplotlib
 import matplotlib.colors as colors
 
-#run in regular python!!!!
 
 datadir = '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/'
 
@@ -49,7 +45,16 @@ hdrb=pyfits.getheader(grids_dir+'303-202_322-221_5kms_temperature_para_tau2.fits
 
 #fit all three lines
 #tex/tau grid sets frequency range (in GHz) over which frequency range is valid 
-formaldehyde_radex_fitter_both=models.model.SpectralModel(models.formaldehyde_mm.formaldehyde_mm_radex, 5, parnames=['temperature', 'column', 'density', 'center', 'width'], parvalues=[50,12,4.5,0,1], parlimited=[(True, True), (True, True), (True, True), (False, False), (True, False)], parlimits=[(5,205), (10,17), (2,7), (0,0), (0,0)], parsteps=[0.01, 0.01, 0.1, 0, 0], fitunits='Hz', texgrid=((218.15, 218.25, texgrid1b), (218.4, 218.55, texgrid2b), (218.7, 218.8, texgrid2a)), taugrid=((218.15, 218.25, taugrid1b), (218.4, 218.55, taugrid2b), (218.7, 218.8, taugrid2a)), hdr=hdrb, shortvarnames=("T", "N", "n", "v", "\\sigma"), grid_vwidth=5.0)
+formaldehyde_radex_fitter_both=models.model.SpectralModel(
+	models.formaldehyde_mm.formaldehyde_mm_radex, 5,
+	parnames=['temperature', 'column', 'density', 'center', 'width'],
+	parvalues=[50,12,4.5,0,1],
+	parlimited=[(True, True), (True, True), (True, True), (False, False), (True, False)],
+	parlimits=[(5,205), (10,17), (2,7), (0,0), (0,0)],
+	parsteps=[0.01, 0.01, 0.1, 0, 0], fitunits='Hz',
+	texgrid=((218.15, 218.25, texgrid1b), (218.4, 218.55, texgrid2b),(218.7, 218.8, texgrid2a)),
+	taugrid=((218.15, 218.25, taugrid1b), (218.4, 218.55, taugrid2b), (218.7, 218.8, taugrid2a)),
+	hdr=hdrb, shortvarnames=("T", "N", "n", "v", "\\sigma"), grid_vwidth=5.0)
 
 formaldehyde_radex_fitter_303322 = models.model.SpectralModel(
     models.formaldehyde_mm.formaldehyde_mm_radex, 5,
@@ -66,7 +71,6 @@ formaldehyde_radex_fitter_303322 = models.model.SpectralModel(
     grid_vwidth=5.0,
 )
 
-# This second fitter fits only the 303-202 and 321-220 lines
 formaldehyde_radex_fitter_303321 = models.model.SpectralModel(
     models.formaldehyde_mm.formaldehyde_mm_radex, 5,
     parnames=['temperature','column','density','center','width'],
@@ -93,7 +97,7 @@ badmask=tmax>=0
 #erode the badmask edge by thismuch to get rid of edges
 rad=150
 data=nd.morphology.binary_erosion(badmask, np.ones((rad, rad)))
-#igma cut- 5*6mJy rms=30 mJy or 0.03Jy
+#sigma cut- 5*6mJy,rms=30 mJy or 0.03Jy
 keep=(tmax*data)>0.025
 #print tmax pixels
 maxim=np.nanmax(data*tmax*keep)#finds max value
@@ -101,15 +105,13 @@ maxind=np.nanargmax(data*tmax*keep)#finds position of max - 1d
 ymax,xmax=np.unravel_index(maxind, tmax.shape)
 print(xmax, ymax)
 #plot to make sure mask is good for all three lines
-pyn=raw_input('Do you want to plot mask?y or n-->')
-if pyn=='y':
-	fig=plt.figure()
-	im=plt.imshow(keep)
-	plt.colorbar(im)
-	plt.gca().invert_yaxis()
-	#plt.savefig(datadir+'T_max_maps/keep321.png')
-	plt.show()
-raw_input('Press enter to continue')
+print 'show mask...'
+fig=plt.figure()
+im=plt.imshow(keep)
+plt.colorbar(im)
+plt.gca().invert_yaxis()
+plt.show()
+
 #Step 4: Maps and spectra
 a=SpectralCube.read(datadir+'alex_imaging_H2CO_303_202_fix/GRS1915_modelimg_H2CO_303_202.image.pbcor.fits')
 a.allow_huge_operations=True
@@ -145,62 +147,54 @@ v1=np.concatenate((a2[:, w, v].value, b2[:, w, v].value, c2[:, w, v].value))
 w1=np.concatenate((a2[:, w, v].spectral_axis.value, b2[:, w, v].spectral_axis.value,c2[:, w, v].spectral_axis.value))
 #need to take only values in concatenation and add units with xarrkwargs below
 w1 /= 1e9
-print 'showing spectra in frequency space where it will be fit'
+print 'showing spectra in frequency space where it will be fit...'
 plt.figure()
 plt.plot(w1, v1, label='test', color='b', ls='-',lw=3)
 plt.ylabel('$T_B$ (K)')
 plt.xlabel('$v$ (km/s)')
 plt.show()
-raw_input('press enter to contnue')
+
 sp=pyspeckit.Spectrum(data=v1, xarr=w1, unit="$T_B$ (K)",xarrkwargs={'unit':'GHz'})
 #add (register) fitters to the spectrum
 sp.Registry.add_fitter('formaldehyde_mm_radex', formaldehyde_radex_fitter_both, 5)
 #plot fit for all 3 ('both')
 sp.plotter(figure=1)
-sp.specfit(fittype='formaldehyde_mm_radex', guesses=[95, 14.5, 4.5, 67, 0.8], limits=[(50,550), (11,17), (3,8.5), (65,70), (0.5,10)], limited=[(True, True)]*5, fixed=[False, False, False, False, False])
-#if v==xmax and w==ymax:
-sp.plotter.savefig(datadir+'T_max_maps/AtestH2CO_spec_'+str(v)+'_'+str(w)+'.png')
+sp.specfit(fittype='formaldehyde_mm_radex',
+	guesses=[95, 14.5, 4.0, 67, 0.8],
+	limits=[(50,550), (11,17), (3,8.5), (65,70), (0.5,10)],
+	limited=[(True, True)]*5,
+	fixed=[False, False, True, False, False])
+#sp.plotter.savefig(datadir+'T_max_maps/AtestH2CO_spec_'+str(v)+'_'+str(w)+'.png')
 print 'fit at peak pixel (', v,w, ') saved.'
 print 'temp', sp.specfit.modelpars[0], '+/-',sp.specfit.modelerrs[0]
 print 'column', sp.specfit.modelpars[1], '+/-',sp.specfit.modelerrs[1]
 print 'density', sp.specfit.modelpars[2], '+/-',sp.specfit.modelerrs[2]
 print 'cen', sp.specfit.modelpars[3], '+/-',sp.specfit.modelerrs[3]
 print 'width', sp.specfit.modelpars[4], '+/-',sp.specfit.modelerrs[4]
-raw_input('Press enter to continue')
+raw_input('Press enter to continue with full fit')
 
 
-vlo=237
-vup=462
-wlow=404
-wup=618
+#vlo=237
+#vup=462
+#wlow=404
+#wup=618
 print 'Beginning fitting loop...'
-#v, w correspond to x,y. - range [300, 425] [400, 550] - max (330,535)
 for v in range(0, a2.shape[1]):
 	for w in range(0, a2.shape[2]):
-#combine three lines into one spectrum by concatenating numpy arrays, y-y axis,x-x axis 
+		#combine three lines into one spectrum by concatenating numpy arrays, y-y axis,x-x axis 
 		if keep[w,v]==True:
 			v1=np.concatenate((a2[:, w, v].value, b2[:, w, v].value, c2[:, w, v].value))
 			w1=np.concatenate((a2[:, w, v].spectral_axis.value, b2[:, w, v].spectral_axis.value,c2[:, w, v].spectral_axis.value))
-#need to take only values in concatenation and add units with xarrkwargs below
+			#need to take only values in concatenation and add units with xarrkwargs below
 			w1 /= 1e9
-			'''plt.plot(w1, v1, label=line, color='b', ls='-',lw=3)
-			plt.ylabel('$T_B$ (K)')
-			plt.xlabel('$v$ (km/s)')
-			plt.show()
-			raw_input()'''
 			sp=pyspeckit.Spectrum(data=v1, xarr=w1, unit="$T_B$ (K)",xarrkwargs={'unit':'GHz'})
-#add (register) fitters to the spectrum
+			#add (register) fitters to the spectrum
 			sp.Registry.add_fitter('formaldehyde_mm_radex', formaldehyde_radex_fitter_both, 5)
-#plot fit for all 3 ('both')
+			#plot fit for all 3 ('both')
 			sp.plotter(figure=1)
-			sp.specfit(fittype='formaldehyde_mm_radex', guesses=[95, 14.5, 4.5, 67, 0.8], limits=[(50,550), (11,17), (3,8.5), (65,70), (0.5,10)], limited=[(True, True)]*5, fixed=[False, False, False, False, False])
-			#if v==xmax and w==ymax:
+			sp.specfit(fittype='formaldehyde_mm_radex',	guesses=[95, 14.5, 4.0, 67, 0.8], limits=[(50,550), (11,17), (3,8.5), (65,70), (0.5,10)], limited=[(True, True)]*5, fixed=[False, False, True, False, False])
 			sp.plotter.savefig(datadir+'T_max_maps/figs/testH2CO_spec_'+str(v)+'_'+str(w)+'.png')
-			print v,w
-			#raw_input('stop')
-#only change center parameter from example
-#sp.plotter.savefig('H2CO_all_radexfit.pdf')
-			#if sp.specfit.modelerrs[0]!=0.:
+			#print v,w
 			table.add_row()
 			table[-1]['x']=v
 			table[-1]['y']=w
@@ -214,20 +208,6 @@ for v in range(0, a2.shape[1]):
 			table[-1]['density errors']=sp.specfit.modelerrs[2]
 			table[-1]['center errors']=sp.specfit.modelerrs[3]
 			table[-1]['width errors']=sp.specfit.modelerrs[4]
-			#else:
-			#table.add_row()
-			#table[-1]['x']=v
-			#table[-1]['y']=w
-			#table[-1]['temp']=np.nan
-			#table[-1]['column']=np.nan
-			#table[-1]['density']=np.nan
-			#table[-1]['center']=np.nan
-			#table[-1]['width']=np.nan
-			#table[-1]['temp errors']=np.nan
-			#table[-1]['column errors']=np.nan
-			#table[-1]['density errors']=np.nan
-			#table[-1]['center errors']=np.nan
-			#table[-1]['width errors']=np.nan
 		else:
 			table.add_row()
 			table[-1]['x']=v
@@ -242,142 +222,169 @@ for v in range(0, a2.shape[1]):
 			table[-1]['density errors']=np.nan
 			table[-1]['center errors']=np.nan
 			table[-1]['width errors']=np.nan
-table.write(datadir+'T_max_maps/grs1915H2COparameters.fits', overwrite=True)
-showmap=raw_input('Done fitting. Fits file written. Do you want to show Temp map?y or n-->')
-#plt.show()
-t=Table.read(datadir+'T_max_maps/grs1915H2COparameters.fits')
-if showmap=='y':
-	plt.figure()
-	plt.rcdefaults()
-	plt.scatter(t['x'], t['y'], c=t['temp'], s=2*t['temp'],edgecolor='none')#s=35*(t['column']-10),edgecolor='none')
-	plt.colorbar(label='Temperature(K)')
-	plt.xlim(0,a2.shape[1])
-	plt.ylim(0,a2.shape[2])
-	plt.savefig(datadir+'T_max_maps/grs1915H2COtempmap.pdf')
-	plt.show()
-
-#fig=plt.figure()
-#im=plt.imshow(np.reshape(t['temp'],(469-268,607-433)))
-#plt.colorbar(im)
-#plt.gca().invert_yaxis()
-#plt.show()
-
-	#ra/dec version
-	i='H2CO_303_202'
-	fits_file1=datadir+'T_max_maps/'+i+'_tmax.fits'
-	hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
-	hdulist.header.remove('CRPIX3')
-	hdulist.header.remove('CRVAL3')
-	hdulist.header.remove('CDELT3')
-	hdulist.header.remove('CUNIT3')
-	hdulist.header.remove('CTYPE3')
-	hdulist.header.remove('CRPIX4')
-	hdulist.header.remove('CRVAL4')
-	hdulist.header.remove('CDELT4')
-	#hdulist.header.remove('CUNIT4')
-	hdulist.header.remove('CTYPE4')
-	hdulist.header['WCSAXES']=2
-	data=hdulist.data
-	wmap=wcs.WCS(hdulist.header)
-	hdulist1 = fits.open(fits_file1)[0]
-	#data1=hdulist1.data
-	wmap1=wcs.WCS(hdulist1.header)
-	coord0=SkyCoord('19h15m40.8s','+10d40m58s',frame='icrs')
-	coord1=SkyCoord('19h15m37.1s','+10d41m44s',frame='icrs')
-	x1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[0])
-	y1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[1])
-	x2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[0])
-	y2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[1])
-
-	x=np.arange(0,len(data[0,:]))
-	y=np.arange(0,len(data[:,0]))
-	X, Y = np.meshgrid(x, y)
-	Z=data#[0,0,490:550,470:550]
-	levels=np.array([1,2,3,4,5,6,7])*0.000345
-	#evels=np.array([1,2,3,4,5,6,7])*0.000345
-	fig=plt.figure()
-	#plt.rcdefaults()
-	plt.rc('xtick.major', size=4)
-	plt.rc('xtick', color='w', labelsize='large')
-	ax1 = fig.add_subplot(111, projection=wmap1.celestial)
-	im=plt.imshow(np.swapaxes(np.reshape(t['temp'],(a2.shape[1],a2.shape[2])),0,1),origin="lower",cmap=cm.get_cmap('jet', 500),norm=colors.PowerNorm(gamma=1.),vmin=0.0)#,vmin=0.0,vmax=2.)10,2
-	cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
-	cbar.set_label('Temperature (K)')
-	ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
-	ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
-	ax1.coords['ra'].set_axislabel('Right Ascension')
-	ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
-	ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
-	ax1.set_ylim(y1, y2)
-	ax1.set_xlim(x1, x2)
-	plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
-	plt.savefig(datadir+'T_max_maps/H2CO_fit_temp_contour.pdf',bbox_inches='tight')
-	plt.show()
-
-	#vla cont
-	i='H2CO_303_202'
-	fits_file1=datadir+'T_max_maps/'+i+'_tmax.fits'
-	hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
-	data=hdulist.data
-	wmap=wcs.WCS(hdulist.header)
-	hdulist1 = fits.open(fits_file1)[0]
-	hdulist1.header.remove('CRPIX3')
-	hdulist1.header.remove('CRVAL3')
-	hdulist1.header.remove('CDELT3')
-	hdulist1.header.remove('CUNIT3')
-	hdulist1.header.remove('CTYPE3')
-	hdulist1.header.remove('CRPIX4')
-	hdulist1.header.remove('CRVAL4')
-	hdulist1.header.remove('CDELT4')
-	hdulist1.header.remove('CUNIT4')
-	hdulist1.header.remove('CTYPE4')
-	hdulist1.header['WCSAXES']=2
-	wmap1=wcs.WCS(hdulist1.header)
-	coord0=SkyCoord('19h15m41.3s','+10d41m01s',frame='icrs')
-	coord1=SkyCoord('19h15m36.9s','+10d41m49s',frame='icrs')
-	x1=float(wmap.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[0])
-	y1=float(wmap.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[1])
-	x2=float(wmap.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[0])
-	y2=float(wmap.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[1])
-	coord3=SkyCoord('19h15m37.1s','+10d41m04s',frame='icrs')
-	x3=float(wmap.wcs_world2pix(coord3.ra.value,coord3.dec.value,0,0,1)[0])
-	y3=float(wmap.wcs_world2pix(coord3.ra.value,coord3.dec.value,0,0,1)[1])
+table.write(datadir+'T_max_maps/grs1915H2COparameters_fixdc.fits', overwrite=True)
+t=Table.read(datadir+'T_max_maps/grs1915H2COparameters_fixdc.fits')
+#test image of temp result
+plt.figure()
+plt.rcdefaults()
+plt.scatter(t['x'], t['y'], c=t['temp'], s=2*t['temp'],edgecolor='none')
+plt.colorbar(label='Temperature(K)')
+plt.xlim(0,a2.shape[1])
+plt.ylim(0,a2.shape[2])
+plt.savefig(datadir+'T_max_maps/grs1915H2COtempmap.pdf')
+plt.show()
 
 
-	x=np.arange(0,a2.shape[1])
-	y=np.arange(0,a2.shape[2])
-	X, Y = np.meshgrid(x, y)
-	Z=np.swapaxes(np.reshape(t['temp'],(a2.shape[1],a2.shape[2])),0,1)#[0,0,490:550,470:550]
-	def co(x):
-		return(2**(x/2.))
-	levels=np.array([25,50,100,200,300])
-	#levels=np.array([co(1),co(2),co(3),co(4),co(5),co(6)])*50
-	#evels=np.array([1,2,3,4,5,6,7])*0.000345
-	#sns.set_style("dark")
-	#cmap1 = mpl.colors.ListedColormap(sns.color_palette("colorblind",10))
-	#cmap2=colors_maps()
-	fig=plt.figure()
-	#plt.rcdefaults()
-	plt.rc('xtick.major', size=4)
-	plt.rc('xtick', color='w', labelsize='large')
-	ax1 = fig.add_subplot(111, projection=wmap.celestial)
-	im=plt.imshow(np.nan_to_num(data),origin="lower",cmap=cm.get_cmap('jet', 500),norm=colors.PowerNorm(gamma=0.7),vmin=0.0)#65,55,65,0.9,0.9,0.9,0.9/x,x,x,0.1,0.03,0.025,0.025,0.025,0.1
-	cbar=plt.colorbar(im, orientation='vertical',fraction=0.0358,pad=0)
-	cbar.set_label('mJy/beam')
-	ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
-	ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
-	ax1.coords['ra'].set_axislabel('Right Ascension')
-	ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
-	ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
-	ax1.set_ylim(y1,y2)
-	ax1.set_xlim(x1,x2)
-	ax1.text(470,550,'4-8 GHz',color='w')
-	e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=40, linewidth=2, fill=False,color='m')
-	ax1.add_patch(e1)
-	plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap1))
-	plt.savefig(datadir+'other_data/H2CO_vla_contour.pdf',bbox_inches='tight')
-	plt.show()
-#import os
-#os.system('cp -r '+datadir+'T_max_maps/H2CO_fit_contour.pdf /home/ubuntu/Dropbox')
+#ra/dec versions
+#temp
+i='H2CO_303_202'
+fits_file1=datadir+'T_max_maps/'+i+'_tmax.fits'
+hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
+hdulist.header.remove('CRPIX3')
+hdulist.header.remove('CRVAL3')
+hdulist.header.remove('CDELT3')
+hdulist.header.remove('CUNIT3')
+hdulist.header.remove('CTYPE3')
+hdulist.header.remove('CRPIX4')
+hdulist.header.remove('CRVAL4')
+hdulist.header.remove('CDELT4')
+#hdulist.header.remove('CUNIT4')
+hdulist.header.remove('CTYPE4')
+hdulist.header['WCSAXES']=2
+data=hdulist.data
+wmap=wcs.WCS(hdulist.header)
+hdulist1 = fits.open(fits_file1)[0]
+#data1=hdulist1.data
+wmap1=wcs.WCS(hdulist1.header)
+coord0=SkyCoord('19h15m40.8s','+10d40m58s',frame='icrs')
+coord1=SkyCoord('19h15m37.1s','+10d41m46s',frame='icrs')
+x1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[0])
+y1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[1])
+x2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[0])
+y2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[1])
+
+x=np.arange(0,len(data[0,:]))
+y=np.arange(0,len(data[:,0]))
+X, Y = np.meshgrid(x, y)
+Z=data#[0,0,490:550,470:550]
+levels=np.array([4,6,8,10,15,20,40,60])*0.00005 
+#evels=np.array([1,2,3,4,5,6,7])*0.000345
+fig=plt.figure()
+plt.rcdefaults()
+plt.rc('xtick.major', size=4)
+#plt.rc('xtick', color='w', labelsize='large')
+ax1 = fig.add_subplot(111, projection=wmap1.celestial)
+im=plt.imshow(np.swapaxes(np.reshape(t['temp'],(a2.shape[1],a2.shape[2])),0,1),origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=1.),vmin=0.0)#,vmin=0.0,vmax=2.)10,2
+cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
+cbar.set_label('Temperature (K)')
+ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
+ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
+ax1.coords['ra'].set_axislabel('Right Ascension')
+ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
+ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
+ax1.set_ylim(y1, y2)
+ax1.set_xlim(x1, x2)
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
+plt.savefig(datadir+'other_data/H2CO_fit_temp_contour.pdf',bbox_inches='tight')
+plt.show()
+
+#column
+fig=plt.figure()
+plt.rcdefaults()
+plt.rc('xtick.major', size=4)
+#plt.rc('xtick', color='w', labelsize='large')
+ax1 = fig.add_subplot(111, projection=wmap1.celestial)
+im=plt.imshow(np.swapaxes(np.reshape(t['column'],(a2.shape[1],a2.shape[2])),0,1),origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=1.),vmin=13,vmax=15)#,vmin=0.0,vmax=2.)10,2
+cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
+cbar.set_label('Column')
+ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
+ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
+ax1.coords['ra'].set_axislabel('Right Ascension')
+ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
+ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
+ax1.set_ylim(y1, y2)
+ax1.set_xlim(x1, x2)
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
+plt.savefig(datadir+'other_data/H2CO_fit_column_contour.pdf',bbox_inches='tight')
+plt.show()
+
+#density
+fig=plt.figure()
+plt.rcdefaults()
+plt.rc('xtick.major', size=4)
+#plt.rc('xtick', color='w', labelsize='large')
+ax1 = fig.add_subplot(111, projection=wmap1.celestial)
+im=plt.imshow(np.swapaxes(np.reshape(t['density'],(a2.shape[1],a2.shape[2])),0,1),origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=1.),vmin=0.0)#,vmin=0.0,vmax=2.)10,2
+cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
+cbar.set_label('Temperature (K)')
+ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
+ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
+ax1.coords['ra'].set_axislabel('Right Ascension')
+ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
+ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
+ax1.set_ylim(y1, y2)
+ax1.set_xlim(x1, x2)
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
+plt.savefig(datadir+'other_data/H2CO_fit_density_contour.pdf',bbox_inches='tight')
+plt.show()
+
+#TEMP CONTOURS ON VLA
+i='H2CO_303_202'
+fits_file1=datadir+'T_max_maps/'+i+'_tmax.fits'
+hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
+data=hdulist.data
+wmap=wcs.WCS(hdulist.header)
+hdulist1 = fits.open(fits_file1)[0]
+hdulist1.header.remove('CRPIX3')
+hdulist1.header.remove('CRVAL3')
+hdulist1.header.remove('CDELT3')
+hdulist1.header.remove('CUNIT3')
+hdulist1.header.remove('CTYPE3')
+hdulist1.header.remove('CRPIX4')
+hdulist1.header.remove('CRVAL4')
+hdulist1.header.remove('CDELT4')
+hdulist1.header.remove('CUNIT4')
+hdulist1.header.remove('CTYPE4')
+hdulist1.header['WCSAXES']=2
+wmap1=wcs.WCS(hdulist1.header)
+#coord0=SkyCoord('19h15m41.3s','+10d41m01s',frame='icrs')
+#coord1=SkyCoord('19h15m36.9s','+10d41m49s',frame='icrs')
+coord0=SkyCoord('19h15m40.8s','+10d40m58s',frame='icrs')
+coord1=SkyCoord('19h15m37.1s','+10d41m46s',frame='icrs')
+x1=float(wmap.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[0])
+y1=float(wmap.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[1])
+x2=float(wmap.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[0])
+y2=float(wmap.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[1])
+coord3=SkyCoord('19h15m37.2s','+10d41m00s',frame='icrs')
+x3=float(wmap.wcs_world2pix(coord3.ra.value,coord3.dec.value,0,0,1)[0])
+y3=float(wmap.wcs_world2pix(coord3.ra.value,coord3.dec.value,0,0,1)[1])
+
+
+x=np.arange(0,a2.shape[1])
+y=np.arange(0,a2.shape[2])
+X, Y = np.meshgrid(x, y)
+Z=np.swapaxes(np.reshape(t['temp'],(a2.shape[1],a2.shape[2])),0,1)#[0,0,490:550,470:550]
+levels=np.array([15,25,50,100,125,150,175,200,300])
+fig=plt.figure()
+plt.rcdefaults()
+plt.rc('xtick.major', size=4)
+ax1 = fig.add_subplot(111, projection=wmap.celestial)
+im=plt.imshow(np.nan_to_num(data),origin="lower",cmap=cm.get_cmap('jet', 500),norm=colors.PowerNorm(gamma=0.7),vmin=0.0)#65,55,65,0.9,0.9,0.9,0.9/x,x,x,0.1,0.03,0.025,0.025,0.025,0.1
+cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
+cbar.set_label('mJy/beam')
+ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
+ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
+ax1.coords['ra'].set_axislabel('Right Ascension')
+ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
+ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
+ax1.set_ylim(y1,y2)
+ax1.set_xlim(x1,x2)
+ax1.text(470,550,'4-8 GHz',color='w')
+e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=40, linewidth=2, fill=False,color='m')
+ax1.add_patch(e1)
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap1))
+plt.savefig(datadir+'other_data/H2CO_vla_contour.pdf',bbox_inches='tight')
+plt.show()
+
 
 

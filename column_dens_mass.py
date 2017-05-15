@@ -92,9 +92,9 @@ Ntot_factor_2to1vec=np.vectorize(Ntot_factor_2to1)
 
 #per spectra version
 
-fits_file_cube18=datadir+'alex_imaging_'+'18CO'+'_fix_all/GRS1915_modelimg_'+'18CO'+'.image.pbcor.fits'
-fits_file_cube12=datadir+'alex_imaging_'+'12CO'+'_fix_all/GRS1915_modelimg_'+'12CO'+'.image.pbcor.fits'
-fits_file_cube13=datadir+'alex_imaging_'+'13CO'+'_fix_all/GRS1915_modelimg_'+'13CO'+'.image.pbcor.fits'
+fits_file_cube18=datadir+'alex_imaging_'+'18CO'+'_fix/GRS1915_modelimg_'+'18CO'+'.image.pbcor.fits'
+fits_file_cube12=datadir+'alex_imaging_'+'12CO'+'_fix/GRS1915_modelimg_'+'12CO'+'.image.pbcor.fits'
+fits_file_cube13=datadir+'alex_imaging_'+'13CO'+'_fix/GRS1915_modelimg_'+'13CO'+'.image.pbcor.fits'
 
 make_TMAX(fits_file_cube12,datadir,'12CO')
 make_TMAX(fits_file_cube13,datadir,'13CO')
@@ -171,14 +171,14 @@ x=np.arange(0,len(data[0,:]))
 y=np.arange(0,len(data[:,0]))
 X, Y = np.meshgrid(x, y)
 Z=data#[0,0,490:550,470:550]
-levels=np.array([1,2,3,4,5,6,7])*0.000345
+levels=np.array([4,6,8,10,15,20,40,60])*0.00005
 #evels=np.array([1,2,3,4,5,6,7])*0.000345
 fig=plt.figure()
 #plt.rcdefaults()
 plt.rc('xtick.major', size=4)
 plt.rc('xtick', color='w', labelsize='large')
 ax1 = fig.add_subplot(111, projection=wmap1.celestial)
-im=plt.imshow(np.nan_to_num(data1)/1e16,origin="lower",cmap=cm.get_cmap('jet', 500),\
+im=plt.imshow(np.nan_to_num(data1)/1e16,origin="lower",cmap=cm.get_cmap('hot_r', 500),\
 norm=colors.PowerNorm(gamma=1),vmin=0.0,vmax=1.2)
 cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
 cbar.set_label('$N_{18{\\rm CO}}\\,\\times 10^{16} \\,{\\rm cm}^{-2}$')
@@ -190,7 +190,7 @@ ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(150, 700)
 ax1.set_xlim(100, 650)
 plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
-plt.savefig(datadir+'columns_plots/18CO_column_contour.pdf',bbox_inches='tight')
+plt.savefig(datadir+'for_paper/18CO_column_contour.pdf',bbox_inches='tight')
 plt.show()
 
 #per spectra version
@@ -218,14 +218,14 @@ x=np.arange(0,len(data[0,:]))
 y=np.arange(0,len(data[:,0]))
 X, Y = np.meshgrid(x, y)
 Z=data#[0,0,490:550,470:550]
-levels=np.array([1,2,3,4,5,6,7])*0.000345
+levels=np.array([4,6,8,10,15,20,40,60])*0.00005
 #evels=np.array([1,2,3,4,5,6,7])*0.000345
 fig=plt.figure()
-#plt.rcdefaults()
+plt.rcdefaults()
 plt.rc('xtick.major', size=4)
-plt.rc('xtick', color='w', labelsize='large')
+#plt.rc('xtick', color='w', labelsize='large')
 ax1 = fig.add_subplot(111, projection=wmap1.celestial)
-im=plt.imshow(np.nan_to_num(data1)/1e22,origin="lower",cmap=cm.get_cmap('jet', 500),norm=colors.PowerNorm(gamma=1),vmin=0.0)
+im=plt.imshow(np.nan_to_num(data1)/1e22,origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=1),vmax=3,vmin=0.0)
 cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
 cbar.set_label('$N_{{\\rm H}2}\\,\\times 10^{22} \\,{\\rm cm}^{-2}$')
 ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
@@ -235,12 +235,12 @@ ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(150, 700)
 ax1.set_xlim(100, 650)
-plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
-plt.savefig(datadir+'columns_plots/H2_column_contour.pdf',bbox_inches='tight')
+plt.contour(X,Y,Z,levels,colors='w',transform=ax1.get_transform(wmap))
+plt.savefig(datadir+'for_paper/H2_column_contour.pdf',bbox_inches='tight')
 plt.show()
 
 #cube version
-hdulist118 = fits.open(fits_file_cube18)[0]
+'''hdulist118 = fits.open(fits_file_cube18)[0]
 data118=hdulist118.data
 #data118H=hdulist118.data
 a=SpectralCube.read(fits_file_cube18)
@@ -256,7 +256,7 @@ for kk in range(0,data118.shape[1]):
 col18_cube=np.nan_to_num(data118)
 header = fits.getdata(fits_file_cube18, header=True)[1]
 fits.writeto(filename=datadir+'columns_plots/18CO_cube_column.fits',output_verify='ignore',\
-	clobber=True,data=data118,header=header)
+	clobber=True,data=data118,header=header)'''
 
 
 

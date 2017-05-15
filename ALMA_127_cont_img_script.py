@@ -30,7 +30,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #define output directory
-my_dir='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/alex_imaging_contspw_fix_redo/'
+my_dir='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/alex_imaging_contspw_fix_redo2/'
 if not os.path.isdir(my_dir):
 	os.system('sudo mkdir '+my_dir)
 	os.system('sudo chown ubuntu '+my_dir)
@@ -209,7 +209,7 @@ else:
 	weighting='natural',nterms=mynterms, mask=mymask12,usescratch=False\
 	,interactive=F,threshold=mythreshold12,niter=myniter12,pbcor=False,minpb=0.2,\
 	phasecenter="J2000 19h15m38.305s 10d41m01.018s")
-	raw_input('Please press enter to continue when you are done.')
+	#raw_input('Please press enter to continue when you are done.')
 os.system('rm -rf '+my_dir+'GRS1915_12m_cont.image')
 os.system('rm -rf '+my_dir+'GRS1915_12m_cont.image.pbcor')
 os.system('rm -rf '+my_dir+'GRS1915_12m_cont.image.pbcor.fits')
@@ -272,7 +272,7 @@ else:
 	weighting='natural',nterms=mynterms, mask=mymask127,usescratch=False\
 	,interactive=F,threshold=mythreshold127,niter=myniter127,pbcor=False,minpb=0.2,\
 	phasecenter="J2000 19h15m38.305s 10d41m01.018s",field=['0~'+numf12, '0~'+numf7],spw=['0','0'])
-	raw_input('Please press enter to continue when you are done.')
+	#raw_input('Please press enter to continue when you are done.')
 os.system('rm -rf '+my_dir+'GRS1915_12m7m_cont.image')
 os.system('rm -rf '+my_dir+'GRS1915_12m7m_cont.image.pbcor')
 os.system('rm -rf '+my_dir+'GRS1915_12m7m_cont.image.pbcor.fits')

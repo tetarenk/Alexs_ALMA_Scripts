@@ -8,13 +8,13 @@ remakems='T'
 spw_arr='2'#for 12m array
 spw_7m='2,11,20'#for 7m array, also  but bad weights
 #general image params
-mythreshold12='0.5mJy'
+mythreshold12='0.1mJy'
 myimsize12=512
 mycell12='0.2arcsec'
-mythreshold7='0.5mJy'
+mythreshold7='0.1mJy'
 myimsize7=128
 mycell7='1arcsec'
-mythreshold127='0.5mJy'
+mythreshold127='0.1mJy'
 myimsize127=512
 mycell127='0.2arcsec'
 mynterms=2
