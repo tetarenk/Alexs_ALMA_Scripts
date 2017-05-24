@@ -34,6 +34,7 @@ dec_line=['10d40m47s','10d41m53s']
 #ra_line=['19h15m39.8s','19h15m37.3s']
 #dec_line=['10d40m44.56s','10d41m50.56s']
 ff=datadir+'alex_imaging_'+line+'_fix/GRS1915_modelimg_'+line+'.image.pbcor.fits'
+#ff=datadir+'columns_plots/18CO_cube_column.fits'
 ############################
 '''pv = PVSlicer(Xkms)
 pv.show()'''
@@ -70,15 +71,17 @@ hdu.header['CUNIT1']='arcsec'
 hdu.header['CDELT1']=cd1*3600.
 w = wcs.WCS(hdu.header)
 
+NTsep1=56.00539935050752
+NTsep2=66.20744343524173
 fig=plt.figure(figsize=(10,7))
 #plt.rc_context({'axes.edgecolor':'white', 'xtick.color':'white', 'ytick.color':'white', 'figure.facecolor':'white'})
 ax=plt.gca()
 #ax2a=ax.twinx()
 #ax=fig.add_axes([0.1,0.1,0.8,0.8],projection=w)
-ax.imshow(datapv,aspect='auto',interpolation='nearest',cmap=plt.get_cmap('hot'))
+ax.imshow(datapv,aspect='auto',interpolation='nearest',cmap=plt.get_cmap('binary'),vmin=0)#,vmax=1.5e16)
 ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x,p :"%.0f"%((cr2/1000.)+x*(cd2/1000.))))
-ax.set_ylim(mjrFormatter(62, cr2,cd2),mjrFormatter(72, cr2,cd2))
-#ax.set_yticks([mjrFormatter(62, cr2,cd2),mjrFormatter(67, cr2,cd2),mjrFormatter(72, cr2,cd2)])
+ax.set_ylim(mjrFormatter(63, cr2,cd2),mjrFormatter(71, cr2,cd2))
+ax.set_yticks([mjrFormatter(63, cr2,cd2),mjrFormatter(66, cr2,cd2),mjrFormatter(69, cr2,cd2)])
 ax.get_xaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x,p :"%.0f"%(x*cd1*3600)))
 #ax.set_xlim(1,375)
 #plt.setp(ax.get_yticklabels(), rotation=55, horizontalalignment='right')
@@ -88,15 +91,18 @@ x=np.arange(0,len(datapv[0,:]))
 y=np.arange(0,len(datapv[:,0]))
 X, Y = np.meshgrid(x, y)
 Z=datapv#[0,0,490:550,470:550]
-levels=np.array([1,2,3,4,5,6,7])*0.345
+#levels=np.array([3,4,5,6,7,8,9])*1.5e15
+levels=np.array([1,2,3,3.5,4,5])*0.08
 plt.contour(X,Y,Z,levels,colors='k')
-for tick in ax.get_xticklines():
+ax.axvspan(NTsep1/(3600.*cd1),NTsep2/(3600.*cd1),color='m',alpha=0.3)
+plt.savefig(datadir+'for_paper/pv_'+line+'.pdf',bbox_inches='tight')
+#plt.savefig(datadir+'for_paper/pvcol18_'+line+'.pdf',bbox_inches='tight')
+plt.show()
+raw_input('stop')
+'''for tick in ax.get_xticklines():
 	tick.set_color('white')
 for tick in ax.get_yticklines():
-	tick.set_color('white')
-plt.savefig(datadir+'PVdiag/pv_'+line+'.pdf',bbox_inches='tight')
-plt.show()
-
+	tick.set_color('white')'''
 
 fits_file1='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/'+'moment_maps/'+line+'_moment'+str(0)+'.fits'
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
@@ -350,7 +356,7 @@ ax4.coords['dec'].set_axislabel('Declination',minpad=-0.7)
 ax4.coords['ra'].set_major_formatter('hh:mm:ss')
 ax4.set_ylim(250, 700)
 ax4.set_xlim(200, 500)
-plt.plot([x1,x2],[y1,y2],marker='',lw=1,color='b',ls='--')
+#plt.plot([x1,x2],[y1,y2],marker='',lw=1,color='b',ls='--')
 rect = patches.Rectangle((x3,y3),np.sqrt((y2-y1)**2+(x2-x1)**2),fifty,angle=np.arctan((y2-y1)/(x2-x1))*(180./np.pi),\
 linewidth=1,edgecolor='b',facecolor='none')
 # Add the patch to the Axes

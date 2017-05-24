@@ -74,12 +74,13 @@ def ratioss(fitsfile1,fitsfile2,ddir,line1,line2):
 	Ys=YK.spectral_slab(60*u.km/u.s,80*u.km/u.s)
 	Yss=Ys.spectral_interpolate(spectral_grid=Xs.spectral_axis)
 	tmax1=Xs.apply_numpy_function(np.nanmax,axis=0)
-	tmax2=Yss.apply_numpy_function(np.nanmax,axis=0)
 	plt.figure()	
-	plt.imshow(tmax1)
-	plt.figure()
-	plt.imshow(tmax2)
-	Xarr=np.array(Xs)
+	im0=plt.imshow(tmax1)
+	plt.colorbar(im0)
+	plt.show()
+	masknum=raw_input('enter mask-->')
+	X_masked=Xs.with_mask(Xs>float(masknum)*u.K)
+	Xarr=np.array(X_masked)
 	Yarr=np.array(Yss)
 	ratio=np.empty((Xarr.shape[1],Xarr.shape[2]))
 	for i in range(0,Xarr.shape[1]):
@@ -95,7 +96,7 @@ def ratioss(fitsfile1,fitsfile2,ddir,line1,line2):
 					maxind=0
 			maxval2=Yarr[maxind,i,j]
 			ratio[i][j]=maxval2/maxval1
-	fits.writeto(filename=ddir+'ratio_maps/'+line2+'_'+line1+'_ratiomap_tmax_matched.fits',output_verify='ignore',\
+	fits.writeto(filename=ddir+'ratio_maps/'+line2+'_'+line1+'_ratiomap_tmax_matched_mask.fits',output_verify='ignore',\
 	clobber=True,data=ratio,header=header)
 #make same number of channels for both!!!!
 line2='12CO'
@@ -104,21 +105,21 @@ line1='13CO'
 #datadir+'alex_imaging_'+line2+'_fix/GRS1915_modelimg_'+line2+'.image.pbcor.fits',datadir,3.,2.,2.,line1,line2)
 #line_ratio_tmax(datadir+'alex_imaging_'+line1+'_fix/GRS1915_modelimg_'+line1+'.image.pbcor.fits',\
 #datadir+'alex_imaging_'+line2+'_fix/GRS1915_modelimg_'+line2+'.image.pbcor.fits',datadir,line1,line2,24)
-'''ratioss(datadir+'alex_imaging_'+line1+'_fix/GRS1915_modelimg_'+line1+'.image.pbcor.fits',\
+ratioss(datadir+'alex_imaging_'+line1+'_fix/GRS1915_modelimg_'+line1+'.image.pbcor.fits',\
 datadir+'alex_imaging_'+line2+'_fix/GRS1915_modelimg_'+line2+'.image.pbcor.fits',datadir,line1,line2)
 raw_input('go')
 #view
 fig=plt.figure()
-filea=pyfits.getdata(datadir+'ratio_maps/'+line2+'_'+line1+'_ratiomap_tmax_matched.fits')
-a=plt.imshow(filea,vmin=0,vmax=5)
+filea=pyfits.getdata(datadir+'ratio_maps/'+line2+'_'+line1+'_ratiomap_tmax_matched_mask.fits')
+a=plt.imshow(filea,vmin=0,vmax=10)
 cbar=fig.colorbar(a)#ticks=[0,0.5,1,1.5,2.])
 #plt.clim(0,2)
 cbar.set_label(line2+'/'+line1)
 plt.gca().invert_yaxis()
 plt.show()
-raw_input('go')'''
+raw_input('go')
 #ra/dec version
-fits_file1=datadir+'ratio_maps/'+line2+'_'+line1+'_ratiomap_tmax_matched.fits'
+fits_file1=datadir+'ratio_maps/'+line2+'_'+line1+'_ratiomap_tmax_matched_mask.fits'
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
 hdulist.header.remove('CRPIX3')
 hdulist.header.remove('CRVAL3')
@@ -158,7 +159,8 @@ ax1 = fig.add_subplot(111, projection=wmap1.celestial)
 im=plt.imshow(np.nan_to_num(data1),origin="lower",cmap=cm.get_cmap('hot_r', 500),\
 norm=colors.PowerNorm(gamma=1.),vmin=1,vmax=3)
 cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
-cbar.set_label(line2+'/'+line1)
+#cbar.set_label(line2+'/'+line1)
+cbar.set_label('$^{12}$CO/$^{13}$CO')
 ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
 ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
 ax1.coords['ra'].set_axislabel('Right Ascension')
@@ -169,7 +171,7 @@ ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(y1,y2)
 ax1.set_xlim(x1,x2)
 plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
-plt.savefig(datadir+'for_paper/'+line2+'_'+line1+'_tmax'+'_contour_zoomed.pdf',bbox_inches='tight')
+plt.savefig(datadir+'for_paper/'+line2+'_'+line1+'_tmax'+'_contour_zoomed_mask.pdf',bbox_inches='tight')
 plt.show()
 
 #import os

@@ -76,7 +76,7 @@ def make_TMAX(fitsfile,ddir,line):
 	fits.writeto(filename=ddir+'T_max_maps/'+line+'_tmax.fits',output_verify='ignore',\
 	clobber=True,data=tmax,header=header)
 
-i='12CO'
+i='H2CO_303_202'
 #make all Tmax maps
 #for i in lines:
 	#make_TMAX(datadir+'alex_imaging_'+i+'/GRS1915_modelimg_'+i+'.image.pbcor.fits',datadir,i)
@@ -114,13 +114,19 @@ wmap=wcs.WCS(hdulist.header)
 hdulist1 = fits.open(fits_file1)[0]
 data1=hdulist1.data
 wmap1=wcs.WCS(hdulist1.header)
+#coord0=SkyCoord('19h15m40.8s','+10d40m58s',frame='icrs')
+#coord1=SkyCoord('19h15m37.1s','+10d41m44s',frame='icrs')
 coord0=SkyCoord('19h15m40.8s','+10d40m58s',frame='icrs')
-coord1=SkyCoord('19h15m37.1s','+10d41m44s',frame='icrs')
+coord1=SkyCoord('19h15m37.1s','+10d41m46s',frame='icrs')
+
 x1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[0])
 y1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,0,0,1)[1])
 x2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[0])
 y2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,0,0,1)[1])
 
+import scipy.ndimage as nd
+rad=80#100,125,125,150,150,100
+#data_mask=nd.morphology.binary_erosion(np.nan_to_num(data1), np.ones((rad, rad)))
 
 x=np.arange(0,len(data[0,:]))
 y=np.arange(0,len(data[:,0]))
@@ -146,6 +152,8 @@ ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(150, 700)
 ax1.set_xlim(100, 650)
+ax1.set_ylim(y1, y2)
+ax1.set_xlim(x1, x2)
 from matplotlib.patches import Rectangle
 r1=Rectangle((385, 560), 15, 15,alpha=1, facecolor='none',edgecolor='white',lw=2,ls='solid',zorder=5)
 r2=Rectangle((400, 570), 20, 25,alpha=1, facecolor='none',edgecolor='white',lw=2,ls='solid',zorder=5)
@@ -159,7 +167,7 @@ ax1.text(365,560, 'A',fontsize=15)
 ax1.text(428,575, 'B',fontsize=15)
 ax1.text(368,485, 'C',fontsize=15)
 ax1.text(585,492, 'D',fontsize=15)'''
-plt.contour(X,Y,Z,levels,colors='w',transform=ax1.get_transform(wmap))
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
 plt.savefig(datadir+'for_paper/'+i+'_tmax_contour.pdf',bbox_inches='tight')
 plt.show()
 

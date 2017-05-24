@@ -68,6 +68,17 @@ levels=np.array([4,6,8,10,15,20,40,60])*0.00005
 coord1915=SkyCoord('19h15m11.6s','10d56m44s',frame='icrs')
 xgrs=float(wmap1.wcs_world2pix(coord1915.ra.value,coord1915.dec.value,1)[0])
 ygrs=float(wmap1.wcs_world2pix(coord1915.ra.value,coord1915.dec.value,1)[1])
+coord1915p5mra=coord1915.ra+5*u.arcmin
+coord1915p5mdec=coord1915.dec+5*u.arcmin
+xgrs2=float(wmap1.wcs_world2pix(coord1915p5mra.value,coord1915p5mdec.value,1)[0])
+ygrs2=float(wmap1.wcs_world2pix(coord1915p5mra.value,coord1915p5mdec.value,1)[1])
+lengarr=ygrs2-ygrs
+endxarr=xgrs+lengarr*np.cos(64*np.pi/180.)
+endyarr=ygrs+lengarr*np.sin(64*np.pi/180.)
+endxarr2=xgrs-lengarr*np.cos(64*np.pi/180.)
+endyarr2=ygrs-lengarr*np.sin(64*np.pi/180.)
+
+
 
 fig,axes=plt.subplots()
 gs=gridspec.GridSpec(4,4,width_ratios=[1,0.5,0.05,1])
@@ -76,7 +87,7 @@ plt.rcdefaults()
 plt.rc('xtick.major', size=4)
 #plt.rc('xtick', color='w', labelsize='large')
 ax1 = plt.subplot(gs[0:4, 0:2], projection=wmap1.celestial)
-im=plt.imshow(np.nan_to_num(data1[:,:]),origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=0.2),vmin=0.0,vmax=5.)#65,55,65,0.9,0.9,0.9,0.9/x,x,x,0.1,0.03,0.025,0.025,0.025,0.1
+im=plt.imshow(np.nan_to_num(data1[:,:]),origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=0.4),vmin=0.0,vmax=5.)#65,55,65,0.9,0.9,0.9,0.9/x,x,x,0.1,0.03,0.025,0.025,0.025,0.1
 #cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
 #cbar.set_label('mJy/beam')
 ax1.tick_params(axis='both', which='major', labelsize=14,width=3,length=7,color='k')
@@ -86,7 +97,9 @@ ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 ax1.coords['ra'].set_major_formatter('hh:mm:ss')
 ax1.set_ylim(y1,y2)
 ax1.set_xlim(x1,x2)
-ax1.plot(xgrs,ygrs,marker='+',ls='',ms=10)
+ax1.arrow(xgrs, ygrs, endxarr-xgrs, endyarr-ygrs, head_width=20, head_length=20, fc='k', ec='k',lw=1)
+ax1.arrow(xgrs, ygrs, endxarr2-xgrs, endyarr2-ygrs, head_width=20, head_length=20, fc='k', ec='k',lw=1)
+ax1.plot(xgrs,ygrs,marker='+',ls='',ms=14,mew=3,color='m')
 ax2 = plt.subplot(gs2[1:3, -1],projection=wmap.celestial)
 plt.rc('xtick', color='w', labelsize='large')
 plt.rc('xtick.major', size=4)
@@ -117,5 +130,5 @@ ax2.set_xlim(x1a,x2a)
 ax2.errorbar(495,485,xerr=fifty5/2,marker=None,ls='',color='k')
 ax2.text(490,480,'15"')
 ax2.set_aspect('equal', 'datalim')
-#plt.savefig(datadir+'for_paper/overv.pdf',bbox_inches='tight')
+plt.savefig(datadir+'for_paper/overv.pdf',bbox_inches='tight')
 plt.show()

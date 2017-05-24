@@ -32,7 +32,7 @@ def mass_est(H2col_fits_file,cell,dist,lims):
 	numarea=numpix*(cell*(dist*1000*3e18)/206265)**2
 	mass=np.nansum(col_data)*(1.00794*2*1.6e-24)*(numarea)/(1.989e33)
 	print np.nansum(col_data),numarea
-	return(mass)
+	return(mass,numpix,numarea)
 
 def make_moment_maps(fitsfile,mind,ddir,line):
 	header = fits.getdata(fitsfile, header=True)[1]
@@ -40,6 +40,8 @@ def make_moment_maps(fitsfile,mind,ddir,line):
 	X.allow_huge_operations=True
 	X1=X.to(u.K, equivalencies=X.beam.jtok_equiv(X.header['RESTFRQ']*u.Hz))
 	Xkms=X1.with_spectral_unit(u.km/u.s,velocity_convention='radio')
+	#Xs=Xkms.spectral_slab(0*u.km/u.s,67*u.km/u.s)
+	#print Xs.spectral_axis
 	mom=Xkms.moment(order=mind)
 	mom_array=np.array(mom)
 	fits.writeto(filename=ddir+'columns_plots/'+line+'_moment'+str(mind)+'.fits',output_verify='ignore',\
@@ -142,10 +144,11 @@ facH2.fill(2.65e21)
 columH2=dat18*facH2
 fits.writeto(filename=datadir+'columns_plots/H2_column.fits',output_verify='ignore',\
 	clobber=True,data=columH2,header=header)
-Mass=mass_est(datadir+'columns_plots/H2_column.fits',0.2,8.6,[385,400,560,575])
+Mass=mass_est(datadir+'columns_plots/H2_column.fits',0.2,8.6,[346,398,510,569])[0]
+
 print 'The mass in the selected region is ', "%.2f" % Mass,'solar masses'
 
-#ridge-[385,400,560,575]-100 solar masses
+#ridge-[379,411,544,577]-602 solar masses
 
 fits_file1=datadir+'columns_plots/18CO_column.fits'
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
@@ -225,7 +228,7 @@ plt.rcdefaults()
 plt.rc('xtick.major', size=4)
 #plt.rc('xtick', color='w', labelsize='large')
 ax1 = fig.add_subplot(111, projection=wmap1.celestial)
-im=plt.imshow(np.nan_to_num(data1)/1e22,origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=1),vmax=3,vmin=0.0)
+im=plt.imshow(np.nan_to_num(data1)/1e22,origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=1),vmax=2,vmin=0.0)
 cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
 cbar.set_label('$N_{{\\rm H}2}\\,\\times 10^{22} \\,{\\rm cm}^{-2}$')
 ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
@@ -235,8 +238,8 @@ ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(150, 700)
 ax1.set_xlim(100, 650)
-plt.contour(X,Y,Z,levels,colors='w',transform=ax1.get_transform(wmap))
-plt.savefig(datadir+'for_paper/H2_column_contour.pdf',bbox_inches='tight')
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
+plt.savefig(datadir+'for_paper/H2_column_contour_lobe.pdf',bbox_inches='tight')
 plt.show()
 
 #cube version
@@ -252,7 +255,7 @@ veloc=np.array(suba.spectral_axis.to(u.km/u.s))
 
 for kk in range(0,data118.shape[1]):
 	data118[0,kk,:,:]=data118[0,kk,:,:]*Nfact_array*veloc[kk]
-	#data118H[0,kk,:,:]=data118H[0,kk,:,:]*facH2*veloc[kk]
+	data118H[0,kk,:,:]=data118H[0,kk,:,:]*facH2*veloc[kk]
 col18_cube=np.nan_to_num(data118)
 header = fits.getdata(fits_file_cube18, header=True)[1]
 fits.writeto(filename=datadir+'columns_plots/18CO_cube_column.fits',output_verify='ignore',\
