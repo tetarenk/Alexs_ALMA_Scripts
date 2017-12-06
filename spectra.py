@@ -1,3 +1,6 @@
+'''CO spectra figure of regions'''
+
+
 from spectral_cube import SpectralCube
 import matplotlib.pyplot as plt
 import astropy.units as u
@@ -52,12 +55,6 @@ def find_peak_pix(tmaxfits,vals=100):
 	#raw_input('stop')
 	return(xmax,ymax)
 
-'''fig=plt.figure()
-a=plt.imshow(tmax)
-cbar=fig.colorbar(a)
-plt.gca().invert_yaxis()
-plt.show()'''
-
 
 def fit_gauss_to_spec(fitsfile,ddir,line,tmaxfits):
 	a=SpectralCube.read(fitsfile)
@@ -80,11 +77,12 @@ def fit_gauss_to_spec(fitsfile,ddir,line,tmaxfits):
 	return(asp.specfit.modelpars,asp.specfit.modelerrs)
 	
 
-'''
+
 #single spectra for a specific line and a specific pixel or region
 line='13CO'
 lim=[385,400,560,575]
-vel,amp=make_spec(datadir+'alex_imaging_'+line+'_fix/GRS1915_modelimg_'+line+'.image.pbcor.fits',datadir,lim,'reg')
+vel,amp=make_spec(datadir+'alex_imaging_'+line+'_fix/GRS1915_modelimg_'+line+'.image.pbcor.fits',\
+	datadir,lim,'reg')
 fig=plt.figure()
 plt.rcdefaults()
 plt.plot(vel, amp, label=line, color='b', ls='-.',lw=3)
@@ -94,36 +92,22 @@ plt.legend(numpoints=1,loc='upper left')
 plt.ylim(0,20)
 #fig.savefig(datadir+'spectra_plots/'+line+'.png',format='png')
 plt.show()
-raw_input('enter')
 
-#single spectra over HMSR for a specific line, do only for full spw cleans
-line='18CO'
-lim=[340,360,470,485]
-vel,amp=make_spec(datadir+'alex_imaging_'+line+'_fix_all/GRS1915_modelimg_'+line+'.image.pbcor.fits',datadir,lim,'reg')
-fig=plt.figure()
-plt.plot(vel, amp, label=line, color='b', ls='-.',lw=3)
-plt.ylabel('$T_B$ (K)')
-plt.xlabel('$v$ (km/s)')
-plt.legend(numpoints=1,loc='upper left')
-plt.ylim(0,20)
-plt.savefig(datadir+'spectra_plots/'+line+'_hmsr.png',format='png')
-plt.show()
-print np.trapz(y=amp,x=vel)
-raw_input('enter')
 
 #single spectra over HMSR for a specific line at peak pixel
 line='H30alpha'
 lim=[361,361,469,469]
-vel,amp=make_spec(datadir+'alex_imaging_'+line+'_fix/GRS1915_modelimg_'+line+'.image.pbcor.fits',datadir,lim,'pix')
+vel,amp=make_spec(datadir+'alex_imaging_'+line+'_fix/GRS1915_modelimg_'+line+'.image.pbcor.fits',\
+	datadir,lim,'pix')
 fig=plt.figure()
 plt.plot(vel, amp, label=line, color='b', ls='-.',lw=3)
 plt.ylabel('$T_B$ (K)')
 plt.xlabel('$v$ (km/s)')
 plt.legend(numpoints=1,loc='upper left')
 plt.ylim(0,0.2)
-plt.savefig(datadir+'spectra_plots/'+line+'_hmsr_peak.png',format='png')
+#plt.savefig(datadir+'spectra_plots/'+line+'_hmsr_peak.png',format='png')
 plt.show()
-raw_input('enter')
+
 
 #getting formaldhyde triplet spectra at max pixel
 tmaxfits=datadir+'T_max_maps/H2CO_303_202_tmax.fits'
@@ -147,7 +131,6 @@ plt.legend(numpoints=1,loc='upper left')
 #plt.ylim(0,2)
 plt.savefig(datadir+'spectra_plots/H2CO_max.pdf',format='pdf')
 plt.show()
-raw_input('enter')'''
 #guassian fitting of a line at max pixel
 '''tmaxfits=datadir+'T_max_maps/H2CO_303_202_tmax.fits'
 line='13CO'
@@ -205,9 +188,10 @@ ax3.plot(v13, a13, label='$^{13}{\\rm CO}$', color='#424242', ls=':',lw=3)
 ax3.plot(v18, a18, label='${\\rm C}^{18}{\\rm O}$', color='k', ls='-',lw=3)
 ax3.text(58, 22, 'C')
 ax3.set_ylim(0,25)
-ax4=fig.add_subplot(224)#off
+ax4=fig.add_subplot(224)#off#[518,597,328,383]
 #lim=[490,505,490,505]
-lim=[507,580,447,492]
+#lim=[507,580,447,492]
+lim=[518,597,328,383]
 v13,a13=make_spec(datadir+'alex_imaging_'+line13+'_fix/GRS1915_modelimg_'+line13+'.image.pbcor.fits',datadir,lim,'reg')
 v12,a12=make_spec(datadir+'alex_imaging_'+line12+'_fix/GRS1915_modelimg_'+line12+'.image.pbcor.fits',datadir,lim,'reg')
 v18,a18=make_spec(datadir+'alex_imaging_'+line18+'_fix/GRS1915_modelimg_'+line18+'.image.pbcor.fits',datadir,lim,'reg')

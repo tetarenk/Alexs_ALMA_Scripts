@@ -1,3 +1,5 @@
+'''Other continuum maps'''
+
 from spectral_cube import SpectralCube
 import numpy as np
 from astropy.io import fits
@@ -17,6 +19,7 @@ import matplotlib.patches as patches
 import matplotlib
 import matplotlib.colors as colors
 import glob
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredEllipse
 
 datadir = '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/'
 
@@ -51,81 +54,8 @@ X, Y = np.meshgrid(x, y)
 Z=data#[0,0,490:550,470:550]
 #levels=np.array([1,2,3,4,5,6,7])*0.000345
 levels=np.array([4,6,8,10,15,20,40,60])*0.00005
-'''imfiles=['/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/residual_MG0450n005_024_all_mipsgal_regrid.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/hspireplw529_herschel_regrid_fix.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/hspirepmw529_herschel_regrid_fix.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/hspirepsw529_herschel_regrid_fix.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/v2.1_ds2_l045_13pca_medmap20_crop_bolocam_regrid.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/GLM_04550-0075_mosaic_I3_glimpse_regrid.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/GLM_04550-0075_mosaic_I4_glimpse_regrid.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/GLM_04550-0075_mosaic_I1_glimpse_regrid.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/GLM_04550-0075_mosaic_I2_glimpse_regrid.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/236_471_1_1424_2_ukidssh_regrid_fix.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/236_471_1_1424_3_ukidssk_regrid_fix.fits',
- '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/236_471_1_1424_1_ukidssj_regrid_fix.fits']'''
-
-##test
-'''fits_file1='/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits'
-hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
-hdulist.header.remove('CRPIX3')
-hdulist.header.remove('CRVAL3')
-hdulist.header.remove('CDELT3')
-hdulist.header.remove('CUNIT3')
-hdulist.header.remove('CTYPE3')
-hdulist.header.remove('CRPIX4')
-hdulist.header.remove('CRVAL4')
-hdulist.header.remove('CDELT4')
-#hdulist.header.remove('CUNIT4')
-hdulist.header.remove('CTYPE4')
-hdulist.header['WCSAXES']=2
-data=hdulist.data
-wmap=wcs.WCS(hdulist.header)
-x=np.arange(0,len(data[0,:]))
-y=np.arange(0,len(data[:,0]))
-X, Y = np.meshgrid(x, y)
-Z=data#[0,0,490:550,470:550]
-levels=np.array([1,2,3,4,5,6,7])*0.000345
-
-fig=plt.figure(figsize=(17,10))
-#plt.rcdefaults()
-plt.rc('xtick.major', size=4)
-plt.rc('xtick', color='w', labelsize='small')
-imfiles='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/hspireplw529_herschel_regrid_fix.fits'
-fits_file1=imfiles
-hdulist1 = fits.open(fits_file1)[0]
-#i == 2:
-data1=hdulist1.data*(9.382805e-7)*(35.2**2)/(0.2**2)
-#i ==3:
-data1=hdulist1.data*(9.382805e-7)*(23.9**2)/(0.2**2)
-#i ==4:
-data1=hdulist1.data*(9.382805e-7)*(17.6**2)/(0.2**2)
-data1=hdulist1.data
-wmap1=wcs.WCS(hdulist1.header)
-coord0=SkyCoord('19h15m41.8s','+10d40m38s',frame='icrs')
-coord1=SkyCoord('19h15m34.9s','+10d41m52s',frame='icrs')
-x1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,1)[0])
-y1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,1)[1])
-x2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,1)[0])
-y2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,1)[1])
-ax=plt.subplot(1,1,1, projection=wmap1.celestial)
-im=plt.imshow(np.nan_to_num(data1),origin="lower",cmap=cm.get_cmap('jet', 500),norm=colors.PowerNorm(gamma=1),vmin=100.)
-cbar=plt.colorbar(im, orientation='vertical',fraction=0.035,pad=0)
-cbar.ax.tick_params(labelsize=6)
-plt.contour(X,Y,Z,levels,colors='w',transform=ax.get_transform(wmap))
-#cbar.set_label('Jy')
-plt.tick_params(axis='both', which='major', labelsize=1,width=3,length=7,color='k')
-plt.tick_params(axis='both', which='minor', labelsize=1,width=1,length=7,color='k')
-ax.coords['ra'].set_axislabel('Right Ascension')
-ax.coords['dec'].set_axislabel('Declination',minpad=-0.1)
-ax.coords['ra'].set_major_formatter('hh:mm:ss.s')
-ax.coords['ra'].set_ticklabel_visible(True)
-ax.coords['dec'].set_ticklabel_visible(True)
-ax.set_ylim(y1,y2)
-ax.set_xlim(x1,x2)
-plt.show()
 
 
-raw_input('stop')'''
 
 imfiles=['/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/236_471_1_1424_1_ukidssj_regrid_fix.fits',\
 '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/v2.1_ds2_l045_13pca_medmap20_crop_bolocam_regrid.fits',\
@@ -150,12 +80,7 @@ label3=['UKIRT','CSO','Herschel','Herschel','Herschel','Spitzer','NASA','NASA','
 label=['$1.33\\mu m$','$1.11mm$', '$500\\mu m$','$350\\mu m$','$250\\mu m$','$24\\mu m$','$22\\mu m$','$12\\mu m$','$8\\mu m$',\
 '$5.8\\mu m$','$4.6\\mu m$','$4.5\\mu m$','$3.6\\mu m$','$3.4\\mu m$','$2.37\\mu m$','$1.78\\mu m$']
 
-#label=['$24\\mu m$','$500\\mu m$','$350\\mu m$','$250\\mu m$','$1.11mm$','$5.8\\mu m$',\
-#'$8\\mu m$','$3.6\\mu m$','$4.5\\mu m$','$1.78\\mu m$','$2.37\\mu m$','$1.33\\mu m$']
-#label2=['MIPSGAL','HSPIRE','HSPIRE','HSPIRE','Bolocam','GLIMPSE','GLIMPSE','GLIMPSE','GLIMPSE',\
-#'UKIDSS','UKIDSS','UKIDSS']
-#label3=['Spitzer','Herschel','Herschel','Herschel','CSO','Spitzer','Spitzer','Spitzer','Spitzer',\
-#'UKIRT','UKIRT','UKIRT']
+#all images
 '''fits_file1='/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits'
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
 hdulist.header.remove('CRPIX3')
@@ -175,9 +100,9 @@ x=np.arange(0,len(data[0,:]))
 y=np.arange(0,len(data[:,0]))
 X, Y = np.meshgrid(x, y)
 Z=data#[0,0,490:550,470:550]
-levels=np.array([1,2,3,4,5,6,7])*0.000345'''
+levels=np.array([1,2,3,4,5,6,7])*0.000345
 
-'''fig=plt.figure(figsize=(17,10))
+fig=plt.figure(figsize=(17,10))
 #plt.rcdefaults()
 plt.rc('xtick.major', size=4)
 plt.rc('xtick', color='w', labelsize='small')
@@ -304,9 +229,11 @@ for i in range(0,len(imfiles)):
 	#plt.setp(ax.get_yticklabels(),visible=False)
 plt.subplots_adjust(wspace=0.2,hspace=0.1,top=0.9,bottom=0.1)
 plt.savefig(datadir+'other_data/'+'all'+'_contour.pdf',bbox_inches='tight')
-plt.show()
-raw_input('stop')'''
-'''#vla cont
+plt.show()'''
+
+
+
+#vla continuum
 fits_file1='/mnt/bigdata/tetarenk/VLA_grs1915_images/grs1915_rob_ms_nopb_tay2_redo_dec16.image.tt0.fits'
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
 hdulist.header.remove('CRPIX3')
@@ -339,13 +266,8 @@ y3=float(wmap1.wcs_world2pix(coord3.ra.value,coord3.dec.value,0,0,1)[1])
 x=np.arange(0,len(data[0,:]))
 y=np.arange(0,len(data[:,0]))
 X, Y = np.meshgrid(x, y)
-Z=data#[0,0,490:550,470:550]
-#levels=np.array([1,2,3,4,5,6,7])*0.000345
-#evels=np.array([1,2,3,4,5,6,7])*0.000345
+Z=data
 levels=np.array([4,6,8,10,15,20,40,60])*0.00005
-#sns.set_style("dark")
-#cmap1 = mpl.colors.ListedColormap(sns.color_palette("colorblind",10))
-#cmap2=colors_maps()
 fig=plt.figure()
 plt.rcdefaults()
 plt.rc('xtick.major', size=4)
@@ -361,14 +283,15 @@ ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(y1,y2)
 ax1.set_xlim(x1,x2)
-#ax1.text(470,550,'4-8 GHz',color='w')
-e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=40, linewidth=2, fill=False,color='m')
+e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=-50.1963, linewidth=2, fill=False,color='m')
 ax1.add_patch(e1)
+ae = AnchoredEllipse(ax1.transData, width=5.31, height=4.5, angle=-50.1963,loc=4, pad=0.5, borderpad=0.4, frameon=True)
+ax1.add_artist(ae)
 plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
 plt.savefig(datadir+'for_paper/vla_contour.pdf',bbox_inches='tight')
 plt.show()
 
-#spectralindex map
+# VLA spectral index map
 fits_file1='/mnt/bigdata/tetarenk/VLA_grs1915_images/grs1915_rob_ms_nopb_tay2_redo_dec16.image.alpha.fits'
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
 hdulist.header.remove('CRPIX3')
@@ -401,12 +324,8 @@ y3=float(wmap1.wcs_world2pix(coord3.ra.value,coord3.dec.value,0,0,1)[1])
 x=np.arange(0,len(data[0,:]))
 y=np.arange(0,len(data[:,0]))
 X, Y = np.meshgrid(x, y)
-Z=data#[0,0,490:550,470:550]
+Z=data
 levels=np.array([4,6,8,10,15,20,40,60])*0.00005
-#evels=np.array([1,2,3,4,5,6,7])*0.000345
-#sns.set_style("dark")
-#cmap1 = mpl.colors.ListedColormap(sns.color_palette("colorblind",10))
-#cmap2=colors_maps()
 fig=plt.figure()
 plt.rcdefaults()
 plt.rc('xtick.major', size=4)
@@ -422,14 +341,15 @@ ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(y1,y2)
 ax1.set_xlim(x1,x2)
-#ax1.text(470,550,'4-8 GHz',color='k')
-e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=40, linewidth=2, fill=False,color='m')
+e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=-50.1963, linewidth=2, fill=False,color='m')
 ax1.add_patch(e1)
+ae = AnchoredEllipse(ax1.transData, width=5.31, height=4.5, angle=-50.1963,loc=4, pad=0.5, borderpad=0.4, frameon=True)
+ax1.add_artist(ae)
 plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
 plt.savefig(datadir+'for_paper/vla_alpha_contour.pdf',bbox_inches='tight')
-plt.show()'''
+plt.show()
 
-#new full plot
+#new full plot for paper (4 ims only)
 
 imfiles=['/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/hpacs_25HPPUNIMAPB_blue_1917_p1149_00_v1.0_1471608553396.fits',\
 '/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/2892p106_ab41-w4-int-3_ra288.9125_dec10.6875_asec300.000.fits',\
@@ -439,7 +359,7 @@ label=['$70\\mu m$','$22\\mu m$','$8\\mu m$','$2.37\\mu m$']
 label2=['PACS','WISE','GLIMPSE','UKIDSS']
 label3=['Hershel','NASA','Spitzer','UKIRT']
 
-#fits_file1='/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits'
+
 hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
 hdulist.header.remove('CRPIX3')
 hdulist.header.remove('CRVAL3')
@@ -466,7 +386,7 @@ plt.rc('xtick.major', size=4)
 #plt.rc('xtick', color='w', labelsize='small')
 minv=[0,180,27,2485]
 maxv=[5,1100,5000,32000]
-pl=[1,1,0.6,0.35]
+pl=[1,1,0.8,0.35]
 for i in range(0,len(imfiles)):
 	fits_file1=imfiles[i]
 	if i==0:
@@ -478,13 +398,13 @@ for i in range(0,len(imfiles)):
 		minvs=minv[i]*(8.287e-9)*1e3*(12**2)/(1.375**2)
 		maxvs=maxv[i]*(8.287e-9)*1e3*(12**2)/(1.375**2)
 	elif i==0:
-		data1=hdulist1.data*1e3*(6.6**2)/(3.2**2)*(2.401998072e-4)
-		minvs=minv[i]*1e3*(6.6**2)/(3.2**2)*(2.401998072e-4)
-		maxvs=maxv[i]*1e3*(6.6**2)/(3.2**2)*(2.401998072e-4)
+		data1=hdulist1.data*(6.6**2)/(3.2**2)#*1e3*(6.6**2)/(3.2**2)*(2.401998072e-4)
+		minvs=minv[i]*(6.6**2)/(3.2**2)#*1e3*(6.6**2)/(3.2**2)*(2.401998072e-4)
+		maxvs=maxv[i]*(6.6**2)/(3.2**2)#*1e3*(6.6**2)/(3.2**2)*(2.401998072e-4)
 	elif i==2:
 		data1=hdulist1.data*(9.382805e-7)*1e3*(2.5**2)/(1.2**2)
 		minvs=minv[i]*(9.382805e-7)*1e3*(2.5**2)/(1.2**2)
-		maxvs=5#maxv[i]*(9.382805e-7)*1e3*(2.5**2)/(1.2**2)
+		maxvs=20#maxv[i]*(9.382805e-7)*1e3*(2.5**2)/(1.2**2)
 	elif i==3:
 		data1=hdulist1.data*(9.382805e-7)*1e3*(0.4**2)/(0.2**2)
 		minvs=minv[i]*(9.382805e-7)*1e3*(0.4**2)/(0.2**2)
@@ -504,15 +424,10 @@ for i in range(0,len(imfiles)):
 	im=plt.imshow(np.nan_to_num(data1),origin="lower",cmap=cm.get_cmap('hot_r', 500),norm=colors.PowerNorm(gamma=pl[i]),vmin=minvs,vmax=maxvs)
 	cbar=plt.colorbar(im, orientation='vertical',fraction=0.0353,pad=0)
 	cbar.ax.tick_params(labelsize=8)
-
-	'''if i==2:
-		cbar.set_ticks([0.001,0.01,0.1,0.4,0.5,1.,2.0,3.0,4.0])
-		cbar.set_ticklabels([0.001,0.01,0.1,0.4,0.5,1.,2.0,3.0,4.0])'''
 	if i==3:
-		cbar.set_ticks([10,15,30,40,60,80])
-		cbar.set_ticklabels([10,15,20,40,60,80])
+		cbar.set_ticks([10,15,30,50,60,80])
+		cbar.set_ticklabels([10,15,20,50,60,80])
 	plt.contour(X,Y,Z,levels,colors='k',transform=ax.get_transform(wmap))
-#cbar.set_label('Jy')
 	plt.tick_params(axis='both', which='major', labelsize=1,width=3,length=7,color='k')
 	plt.tick_params(axis='both', which='minor', labelsize=1,width=1,length=7,color='k')
 	if i==1:
@@ -521,18 +436,21 @@ for i in range(0,len(imfiles)):
 		ax.coords['ra'].set_major_formatter('hh:mm:ss')
 		ax.coords['ra'].set_ticklabel_visible(False)
 		ax.coords['dec'].set_ticklabel_visible(False)
+		#cbar.set_label('mJy/beam')
 	elif i==3:
 		ax.coords['ra'].set_axislabel('Right Ascension')
 		ax.coords['dec'].set_axislabel('',minpad=-0.1)
 		ax.coords['ra'].set_major_formatter('hh:mm:ss')
 		ax.coords['ra'].set_ticklabel_visible(True)
 		ax.coords['dec'].set_ticklabel_visible(False)
+		#cbar.set_label('mJy/beam')
 	elif i ==2:
 		ax.coords['ra'].set_axislabel('Right Ascension')
 		ax.coords['dec'].set_axislabel('Declination',minpad=-0.1)
 		ax.coords['ra'].set_major_formatter('hh:mm:ss')
 		ax.coords['ra'].set_ticklabel_visible(True)
 		ax.coords['dec'].set_ticklabel_visible(True)
+		#cbar.set_label('mJy/beam')
 		
 	elif i==0:
 		ax.coords['ra'].set_axislabel('')
@@ -540,6 +458,7 @@ for i in range(0,len(imfiles)):
 		ax.coords['ra'].set_major_formatter('hh:mm:ss')
 		ax.coords['ra'].set_ticklabel_visible(False)
 		ax.coords['dec'].set_ticklabel_visible(True)
+		#cbar.set_label('Jy/beam')
 	ax.set_ylim(y1,y2)
 	ax.set_xlim(x1,x2)
 	if i==0:
@@ -562,4 +481,68 @@ for i in range(0,len(imfiles)):
 plt.savefig(datadir+'for_paper/'+'all'+'_contour.pdf',bbox_inches='tight')
 plt.show()
 
+#pacs map
+fits_file1='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/other_data/hpacs_25HPPUNIMAPB_blue_1917_p1149_00_v1.0_1471608553396.fits'
+hdulist = fits.open('/mnt/bigdata/tetarenk/VLA_grs1915_images/GRSVLA.fits')[0]
+hdulist.header.remove('CRPIX3')
+hdulist.header.remove('CRVAL3')
+hdulist.header.remove('CDELT3')
+hdulist.header.remove('CUNIT3')
+hdulist.header.remove('CTYPE3')
+hdulist.header.remove('CRPIX4')
+hdulist.header.remove('CRVAL4')
+hdulist.header.remove('CDELT4')
+#hdulist.header.remove('CUNIT4')
+hdulist.header.remove('CTYPE4')
+hdulist.header['WCSAXES']=2
+data=hdulist.data
+wmap=wcs.WCS(hdulist.header)
+hdulist1 = fits.open(fits_file1)[1]
+data1=hdulist1.data*(6.6**2)/(3.2**2)
+wmap1=wcs.WCS(hdulist1.header)
+coord0=SkyCoord('19h15m45.907s','+10d40m07.796s',frame='icrs')
+coord1=SkyCoord('19h15m34.491s','+10d42m59.3s',frame='icrs')
+x1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,1)[0])
+y1=float(wmap1.wcs_world2pix(coord0.ra.value,coord0.dec.value,1)[1])
+x2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,1)[0])
+y2=float(wmap1.wcs_world2pix(coord1.ra.value,coord1.dec.value,1)[1])
+coord3=SkyCoord('19h15m37.3s','+10d41m01s',frame='icrs')
+x3=float(wmap1.wcs_world2pix(coord3.ra.value,coord3.dec.value,1)[0])
+y3=float(wmap1.wcs_world2pix(coord3.ra.value,coord3.dec.value,1)[1])
+
+
+x=np.arange(0,len(data[0,:]))
+y=np.arange(0,len(data[:,0]))
+X, Y = np.meshgrid(x, y)
+Z=data
+levels=np.array([4,6,8,10,15,20,40,60])*0.00005
+xp2=np.arange(0,len(data1[0,:]))
+yp2=np.arange(0,len(data1[:,0]))
+X2, Y2 = np.meshgrid(xp2, yp2)
+Z2=data1
+levels2=np.array([0.35,0.5,0.6,0.8,1,2,4,6])*1.
+fig=plt.figure()
+plt.rcdefaults()
+plt.rc('xtick.major', size=4)
+#plt.rc('xtick', color='w', labelsize='large')
+ax1 = fig.add_subplot(111, projection=wmap1.celestial)
+im=plt.imshow(np.nan_to_num(data1[:,:]),origin="lower",cmap=cm.get_cmap('hot', 500),norm=colors.PowerNorm(gamma=0.45),vmin=0*(6.6**2)/(3.2**2),vmax=5*(6.6**2)/(3.2**2))#,vmax=0.8)#65,55,65,0.9,0.9,0.9,0.9/x,x,x,0.1,0.03,0.025,0.025,0.025,0.1
+cbar=plt.colorbar(im, orientation='vertical',fraction=0.04,pad=0)
+cbar.set_label('Jy/beam')
+ax1.tick_params(axis='both', which='major', labelsize=15,width=3,length=7,color='k')
+ax1.tick_params(axis='both', which='minor', labelsize=15,width=1,length=7,color='k')
+ax1.coords['ra'].set_axislabel('Right Ascension')
+ax1.coords['dec'].set_axislabel('Declination',minpad=-0.1)
+ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
+ax1.set_ylim(y1,y2)
+ax1.set_xlim(x1,x2)
+#ax1.text(470,550,'4-8 GHz',color='k')
+#e1 = patches.Ellipse((x3,y3), 5.31, 4.50,angle=-50.1963, linewidth=2, fill=False,color='m')
+#ax1.add_patch(e1)
+#ae = AnchoredEllipse(ax1.transData, width=5.31, height=4.5, angle=-50.1963,loc=4, pad=0.5, borderpad=0.4, frameon=True)
+#ax1.add_artist(ae)
+plt.contour(X2,Y2,Z2,levels2,colors='w')
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
+plt.savefig(datadir+'for_paper/pacs_contour.pdf',bbox_inches='tight')
+plt.show()
 

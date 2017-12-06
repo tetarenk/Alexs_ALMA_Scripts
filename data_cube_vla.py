@@ -1,3 +1,6 @@
+'''Big plot of VLA continuum on a spw by spw basis '''
+
+
 from spectral_cube import SpectralCube
 from astropy import units as u
 import numpy as np

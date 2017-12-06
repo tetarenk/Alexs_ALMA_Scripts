@@ -1,3 +1,6 @@
+'''make big grs1915 field overview map for paper'''
+
+
 from spectral_cube import SpectralCube
 import numpy as np
 from astropy.io import fits

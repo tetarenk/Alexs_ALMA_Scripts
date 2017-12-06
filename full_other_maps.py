@@ -1,3 +1,6 @@
+'''Big plot of all other wavlegth maps for diagnostic purposes'''
+
+
 from spectral_cube import SpectralCube
 import numpy as np
 from astropy.io import fits

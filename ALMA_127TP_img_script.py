@@ -39,7 +39,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #define output directory
-my_dir='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/alex_imaging_CS_fix/'
+my_dir='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/alex_imaging_H2CO_322_221_fix2/'
 if not os.path.isdir(my_dir):
 	os.system('sudo mkdir '+my_dir)
 	os.system('sudo chown ubuntu '+my_dir)
@@ -50,7 +50,7 @@ print 'You have set your output directory to ', my_dir
 print 'All output images & intermediate data products are put in this directory.\n'
 
 #param file location
-param_dir_file='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/alexs_scripts/params_CS.txt'
+param_dir_file='/mnt/bigdata/tetarenk/ALMA_GRS1915_105/alexs_scripts/params_H2CO_322_221.txt'
 print 'You have set your param file to ', param_dir_file
 print 'Please make sure all parameters are correct, they will change for each line!\n'
 

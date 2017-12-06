@@ -1,3 +1,5 @@
+'''RADEX fitting of thermometry lines'''
+
 import pyspeckit
 import matplotlib
 import pyfits
@@ -97,8 +99,8 @@ badmask=tmax>=0
 #erode the badmask edge by thismuch to get rid of edges
 rad=150
 data=nd.morphology.binary_erosion(badmask, np.ones((rad, rad)))
-#sigma cut- 5*6mJy,rms=30 mJy or 0.03Jy
-keep=(tmax*data)>0.025
+#sigma cut- 5*5mJy,rms=25 mJy or 0.025Jy or 0.25K
+keep=(tmax*data)>0.25#0.025
 #print tmax pixels
 maxim=np.nanmax(data*tmax*keep)#finds max value
 maxind=np.nanargmax(data*tmax*keep)#finds position of max - 1d
@@ -285,7 +287,7 @@ ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 ax1.set_ylim(y1, y2)
 ax1.set_xlim(x1, x2)
 plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
-plt.savefig(datadir+'other_data/H2CO_fit_temp_contour.pdf',bbox_inches='tight')
+plt.savefig(datadir+'for_paper/H2CO_fit_temp_contour.pdf',bbox_inches='tight')
 plt.show()
 
 #column

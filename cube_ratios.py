@@ -1,3 +1,6 @@
+'''create ratio maps'''
+
+
 from spectral_cube import SpectralCube
 from astropy.io import fits
 import astropy.units as u
@@ -170,10 +173,8 @@ ax1.coords['ra'].set_major_formatter('hh:mm:ss.s')
 #ax1.set_xlim(100, 650)
 ax1.set_ylim(y1,y2)
 ax1.set_xlim(x1,x2)
-plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap))
+plt.contour(X,Y,Z,levels,colors='k',transform=ax1.get_transform(wmap),linewidths=2)
 plt.savefig(datadir+'for_paper/'+line2+'_'+line1+'_tmax'+'_contour_zoomed_mask.pdf',bbox_inches='tight')
 plt.show()
 
-#import os
-#os.system('cp -r '+datadir+'ratio_maps/'+line1+'_'+line2+'_tmax'+'_contour.pdf /home/ubuntu/Dropbox')
 	
